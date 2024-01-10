@@ -62,6 +62,13 @@ const query = async (name) => {
     return response.results.at(-1);
 };
 
+const queryAll = async () => {
+    const response = await notion.databases.query({
+        database_id: databaseId,
+    });
+    return response.results;
+};
+
 const update = async (pageId) => {
     const response = await notion.pages.update({
         page_id: pageId,
@@ -82,7 +89,11 @@ const update = async (pageId) => {
     return response;
 };
 
-// const del = async(id) => {}
+const del = async(id) => {
+    await notion.blocks.delete({
+        block_id: id
+    })
+}
 
 const main = async () => {
     const name = "Pedrinho Gameplays";
@@ -97,4 +108,12 @@ const main = async () => {
     }
 };
 
-main();
+const clean = async () => {
+    const list = await queryAll()
+    for (const item of list) {
+        del(item.id)
+    }
+}
+
+// main();
+clean()
