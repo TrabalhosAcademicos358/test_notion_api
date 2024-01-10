@@ -49,13 +49,49 @@ const create = async (name, description) => {
     return response;
 };
 
+const query = async (name) => {
+    const response = await notion.databases.query({
+        database_id: databaseId,
+        filter: {
+            property: "name",
+            rich_text: {
+                contains: name,
+            },
+        },
+    });
+    return response.results.at(-1);
+};
+
+const update = async (pageId) => {
+    const response = await notion.pages.update({
+        page_id: pageId,
+        properties: {
+            description: {
+                type: "rich_text",
+                rich_text: [
+                    {
+                        type: "text",
+                        text: {
+                            content: "E nesse vídeo",
+                        },
+                    },
+                ],
+            },
+        },
+    });
+    return response;
+};
+
+// const del = async(id) => {}
+
 const main = async () => {
+    const name = "Pedrinho Gameplays";
+    const description = "Oi galerinha, bora para mais um vídeo no canal";
     try {
-        const response = await create(
-            "Pedrinho Gameplays",
-            "Oi galerinha, bora para mais um vídeo no canal"
-        );
-        console.log(response);
+        await create(name, description);
+        const responseQuery = await query(name);
+        const updateRes = await update(responseQuery.id);
+        console.log(updateRes);
     } catch (error) {
         console.error(error);
     }
